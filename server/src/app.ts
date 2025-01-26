@@ -8,7 +8,9 @@ dotenv.config();
 const app = express();
 
 // Security middleware
-app.use(cors());
+app.use(cors({
+    origin: 'https://questssearch.vercel.app'
+}));
 app.use(express.json());
 
 //ROUTES:-
