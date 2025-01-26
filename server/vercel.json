@@ -2,17 +2,15 @@
     "version": 2,
     "builds": [
         {
-            "src": "dist/server.js",
+            "src": "dist/index.js",
             "use": "@vercel/node",
-            "config": {
-                "maxDuration": 60
-            }
+            "config": { "includeFiles": ["dist/**"], "maxDuration": 60 }
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "dist/app.js"
+            "dest": "dist/index.js"
         }
     ]
 }
