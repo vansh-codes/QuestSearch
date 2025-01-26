@@ -1,39 +1,15 @@
 {
     "version": 2,
-    "name": "questsearch-api",
     "builds": [
         {
-            "src": "dist/server.js",
+            "src": "src/server.ts",
             "use": "@vercel/node"
         }
     ],
     "routes": [
         {
-            "src": "/api/health",
-            "dest": "/api/health.ts",
-            "methods": ["GET"]
-        },
-        {
-            "src": "/api/search",
-            "dest": "/api/search.ts",
-            "methods": ["GET"]
-        },
-        {
-            "src": "/api/(.*)",
-            "dest": "dist/server.js"
-        },
-        {
             "src": "/(.*)",
-            "dest": "dist/404.html"
+            "dest": "src/server.ts"
         }
-    ],
-    "env": {
-        "NODE_ENV": "production",
-        "MONGO_URI": "@mongo_uri"
-    },
-    "build": {
-        "env": {
-            "NODE_ENV": "production"
-        }
-    }
+    ]
 }
