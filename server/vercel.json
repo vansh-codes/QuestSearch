@@ -1,15 +1,18 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "src/server.ts",
-            "use": "@vercel/node"
-        }
-    ],
     "routes": [
         {
-            "src": "/(.*)",
-            "dest": "src/server.ts"
+            "src": "/api/health",
+            "dest": "/api/health.ts",
+            "methods": ["GET"]
+        },
+        {
+            "src": "/api/search",
+            "dest": "/api/search.ts"
+        },
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/$1"
         }
     ]
 }

@@ -14,7 +14,6 @@ app.use(express.json());
 //ROUTES:-
 
 app.use('/api', searchRoutes);
-app.use('/health', )
 
 app.use(errorHandler);
 
