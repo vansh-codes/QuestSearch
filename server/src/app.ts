@@ -9,8 +9,13 @@ const app = express();
 
 // Security middleware
 app.use(cors({
-    origin: 'https://questssearch.vercel.app'
+    origin: 'https://questssearch.vercel.app',
+    methods: ['GET'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    exposedHeaders: ['Access-Control-Allow-Origin']
 }));
+
 app.use(express.json());
 
 //ROUTES:-
