@@ -101,7 +101,7 @@ export const useQuestions = (
     } catch (err) {
       // don't set error if request was cancelled
       if (axios.isCancel(err)) {
-        console.log('request cancelled')
+        // console.log('request cancelled')
         return
       }
 

@@ -70,8 +70,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     </div>
   )
 
-  console.log('questions', questions)
-
   return (
     <div className='w-full max-w-4xl mx-auto'>
       <div className='grid gap-4 mb-8'>
