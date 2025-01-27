@@ -20,7 +20,13 @@ const QuestionSchema: Schema = new Schema({
     solution: { type: String, required: true },
 }, { timestamps: true, autoIndex: true });
 
+// text index for title searches
+QuestionSchema.index({ title: 'text' });
+
 // Compound index for sorting and filtering
-QuestionSchema.index({ title: 1, createdAt: -1 });
+QuestionSchema.index({
+    type: 1,      // first level of filtering
+    createdAt: -1 // second level (for sorting, -1 for descending)
+});
 
 export const Question = mongoose.model<IQuestion>('Question', QuestionSchema);

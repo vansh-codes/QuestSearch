@@ -36,9 +36,22 @@ export const createSearchQuery = (
     return query;
 };
 
-export const validatePaginationParams = (page: any, limit: any) => {
-    const validatedPage = Math.max(1, parseInt(page) || 1);
-    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit) || 10));
+export const validatePaginationParams = (page: any, limit: any, maxLimit: number = 100, maxPage: number = 1000) => {
+    let validatedPage = parseInt(page as string, 10);
+    let validatedLimit = parseInt(limit as string, 10);
+
+    // Validate limit
+    if (isNaN(validatedLimit) || validatedLimit < 1) {
+        validatedLimit = 10;
+    }
+    validatedLimit = Math.min(validatedLimit, maxLimit);
+
+    // Validate page
+    if (isNaN(validatedPage) || validatedPage < 1) {
+        validatedPage = 1;
+    }
+    validatedPage = Math.min(validatedPage, maxPage);
+
     return { validatedPage, validatedLimit };
 };
 

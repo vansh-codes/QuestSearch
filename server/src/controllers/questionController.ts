@@ -8,7 +8,7 @@ export const searchQuestions = async (req: Request, res: Response): Promise<void
     try {
         const { query = '', page = 1, limit = 10, sort = 'createdAt', order = 'asc', types = [] } = req.query;
 
-        if (query === '') {
+        if (!query || typeof query !== 'string') {
             sendErrorResponse(res, 'Search query is required', 400);
             return;
         }
@@ -20,13 +20,17 @@ export const searchQuestions = async (req: Request, res: Response): Promise<void
                 ? types
                 : [];
 
+
         // validate pagination parameters
-        const { validatedPage, validatedLimit } = validatePaginationParams(page, limit);
+        const MAX_LIMIT = 100;
+        const MAX_PAGE = 1000;
+
+        const { validatedPage, validatedLimit } = validatePaginationParams(page, limit, MAX_LIMIT, MAX_PAGE);
 
         // validate sort parameters
         const { sortField: validSortField, sortOrder: validSortOrder } =
             validateSortParams(sort as string, order as string);
-
+            
         // create search query
         const searchQuery = createSearchQuery(query as string, typesList.map(type => type.toString()));
 
@@ -40,12 +44,18 @@ export const searchQuestions = async (req: Request, res: Response): Promise<void
                 .skip((validatedPage - 1) * validatedLimit)
                 .limit(validatedLimit)
                 .sort(sortObject)
-                .lean()
+                .setOptions({ allowDiskUse: true, maxTimeMS: 60000 })
                 .exec(),
             Question.countDocuments(searchQuery)
         ]);
 
         const totalPages = Math.ceil(total / validatedLimit);
+
+        // Validate page number against total pages
+        if (validatedPage > totalPages && totalPages > 0) {
+            sendErrorResponse(res, `Page number exceeds total pages. Maximum page is ${totalPages}`, 400);
+            return;
+        }
 
         sendSuccessResponse(res, {
             questions,
