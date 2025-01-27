@@ -15,4 +15,4 @@ const FilterBadge: React.FC<FilterBadgeProps> = ({ label, onRemove }) => (
   </span>
 )
 
-export default FilterBadge
+export default React.memo(FilterBadge)

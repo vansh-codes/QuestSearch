@@ -1,59 +1,88 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback, useMemo, lazy, Suspense } from 'react'
 import SearchBar from './components/SearchBar/SearchBar'
-import SearchResults from './components/SearchResults/SearchResults'
 import { useQuestions } from './hooks/useQuestions'
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary'
-import { FiLoader, FiAlertCircle, FiFilter } from 'react-icons/fi'
+import { FiLoader, FiFilter } from 'react-icons/fi'
 import FilterBadge from './components/Filters/FiltersBadge'
-import FilterModal from './components/Filters/FilterModal'
+import { Error } from './components/Error/Error'
+import { EmptyState } from './components/EmptyState/EmptyState'
+
+const FilterModal = lazy(() => import('./components/Filters/FilterModal'))
+const SearchResults = lazy(() => import('./components/SearchResults/SearchResults'))
 
 const App: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [currentPage, setCurrentPage] = useState<number>(1)
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [sortField, setSortField] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [batchLimit, setBatchLimit] = useState<number>(10)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false)
-  const ITEMS_PER_PAGE = 10
+
+  const searchParams = useMemo(() => ({
+    sortField,
+    sortOrder,
+    types: selectedTypes,
+  }), [sortField, sortOrder, selectedTypes]);
 
   const { questions, totalPages, loading, error, refetch } = useQuestions(
     searchQuery,
     currentPage,
-    ITEMS_PER_PAGE,
-    {
-      sortField,
-      sortOrder,
-      types: selectedTypes,
-    }
+    batchLimit,
+    searchParams
   )
 
-  const handleTypeClick = (type: string) => {
-    if (!selectedTypes.includes(type)) {
-      setSelectedTypes([...selectedTypes, type])
-      setCurrentPage(1)
-    }
-  }
+  const handleTypeClick = useCallback((type: string) => {
+    setSelectedTypes(prev => {
+      if (!prev.includes(type)) {
+        return [...prev, type];
+      }
+      return prev;
+    });
+    setCurrentPage(1);
+  }, []);
 
-  const handleTypeSelect = (types: string[]) => {
+  const handleTypeSelect = useCallback((types: string[]) => {
     setSelectedTypes(types)
     setCurrentPage(1)
-  }
+  }, [])
 
-  const handleTypeRemove = (type: string) => {
+  const handleTypeRemove = useCallback((type: string) => {
     setSelectedTypes(selectedTypes.filter((t) => t !== type))
     setCurrentPage(1)
-  }
+  }, [selectedTypes])
 
-  const handleSortChange = (field: string, order: 'asc' | 'desc') => {
+  const handleSortChange = useCallback((field: string, order: 'asc' | 'desc') => {
     setSortField(field)
     setSortOrder(order)
     setCurrentPage(1)
-  }
+  }, [])
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query)
     setCurrentPage(1)
-  }
+  }, [])
+
+  const filterModalProps = useMemo(() => ({
+    isOpen: isFilterModalOpen,
+    onClose: () => setIsFilterModalOpen(false),
+    selectedTypes,
+    onTypeSelect: handleTypeSelect,
+    sortField,
+    sortOrder,
+    onSortChange: handleSortChange,
+    batchLimit,
+    onBatchLimitChange: setBatchLimit,
+  }), [isFilterModalOpen, selectedTypes, handleTypeSelect, sortField, sortOrder, handleSortChange, batchLimit])
+
+  const searchResultsProps = useMemo(() => ({
+    questions,
+    query: searchQuery,
+    currentPage,
+    totalPages,
+    onPageChange: setCurrentPage,
+    onTypeClick: handleTypeClick,
+  }), [questions, searchQuery, currentPage, totalPages, handleTypeClick]);
 
   return (
     <ErrorBoundary>
@@ -73,7 +102,7 @@ const App: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsFilterModalOpen(true)}
-                className='p-3 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-[#ff5a2e]'
+                className='p-3 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-[#ff5a2e] cursor-pointer'
                 aria-label='Open filters'
                 title='Open filters and sorting options'
               >
@@ -99,16 +128,18 @@ const App: React.FC = () => {
           </div>
 
           {/* Filter Modal */}
-          <FilterModal
-            isOpen={isFilterModalOpen}
-            onClose={() => setIsFilterModalOpen(false)}
-            selectedTypes={selectedTypes}
-            onTypeSelect={handleTypeSelect}
-            sortField={sortField}
-            sortOrder={sortOrder}
-            onSortChange={handleSortChange}
-            aria-label='Filter and sort options'
-          />
+          <Suspense fallback={
+            <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
+              <FiLoader className="w-8 h-8 text-white animate-spin" />
+            </div>
+          }>
+            {isFilterModalOpen &&
+              <FilterModal
+                {...filterModalProps}
+                aria-label='Filter and sort options'
+              />
+            }
+          </Suspense>
 
           {loading && (
             <div
@@ -122,60 +153,25 @@ const App: React.FC = () => {
           )}
 
           {error && (
-            <>
-              <div
-                className='max-w-md mx-auto bg-red-50 p-4 rounded-lg flex items-center justify-between'
-                role='alert'
-              >
-                <div className='flex items-center space-x-3'>
-                  <FiAlertCircle className='text-red-500 w-5 h-5' />
-                  <span className='text-red-700'>{error}</span>
-                </div>
-                <button
-                  onClick={refetch}
-                  className='px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors duration-200'
-                  aria-label='Retry search'
-                >
-                  Retry
-                </button>
-              </div>
-              <div className='flex justify-center items-center py-12' aria-label='Search Failed'>
-                <img src='./fail.svg' alt='Search Failed' className='h-48 w-48' draggable={false} />
-              </div>
-            </>
+            <Error error={error} onRetry={refetch} />
           )}
 
           {!loading && !error && questions.length === 0 && (
-            <div
-              className='flex flex-col items-center justify-center py-12 text-gray-500 selection:text-black'
-              role='status'
-              aria-label='No results found'
-            >
-              <img
-                src='./search.svg'
-                alt='Placeholder search icon'
-                draggable={false}
-                className='h-16 w-16 mb-4 text-gray-400'
-                loading='lazy'
-              />
-              <p className='text-lg font-medium'>Start searching!</p>
-              <p className='text-sm text-gray-400 mt-1'>
-                Enter a keyword or phrase to find relevant questions.
-              </p>
-            </div>
+            <EmptyState />
           )}
 
           {!loading && !error && questions.length > 0 && (
-            <section aria-label='Search results'>
-              <SearchResults
-                questions={questions}
-                query={searchQuery}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-                onTypeClick={handleTypeClick}
-              />
-            </section>
+            <Suspense fallback={
+              <div className="flex justify-center py-8">
+                <FiLoader className="w-8 h-8 text-[#ff5a2e] animate-spin" />
+              </div>
+            }>
+              <section aria-label='Search results'>
+                <SearchResults
+                  {...searchResultsProps}
+                />
+              </section>
+            </Suspense>
           )}
         </div>
       </div>
@@ -183,4 +179,4 @@ const App: React.FC = () => {
   )
 }
 
-export default App
+export default React.memo(App)

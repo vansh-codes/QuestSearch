@@ -45,8 +45,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
         {query && (
           <button
             onClick={clearSearch}
-            className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#ff5a2e] focus:outline-none hover:cursor-pointer'
+            className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#ff5a2e] focus:outline-hidden focus:ring-2 focus:ring-[#ff5a2e] hover:cursor-pointer rounded-xl'
             aria-label='Clear search'
+            tabIndex={0}
+            title='Clear search'
           >
             <FiX className='w-5 h-5 text-gray-500' />
           </button>

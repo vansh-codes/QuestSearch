@@ -3,25 +3,7 @@ import { Question } from '../types/question.types'
 import { ApiResponse, SearchResponse } from '../types/question.types'
 import axios from 'axios'
 import debounce from 'lodash/debounce'
-
-interface UseQuestionsReturn {
-  questions: Question[]
-  totalPages: number
-  loading: boolean
-  error: string | null
-  refetch: () => Promise<void>
-}
-
-interface UseQuestionsOptions {
-  sortField?: string
-  sortOrder?: 'asc' | 'desc'
-  types?: string[]
-}
-
-interface CacheData {
-  data: SearchResponse
-  timestamp: number
-}
+import { CacheData, UseQuestionsOptions, UseQuestionsReturn } from './interface'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 const CACHE_DURATION = 5 * 60 * 1000 // 5mins
@@ -29,7 +11,7 @@ const CACHE_DURATION = 5 * 60 * 1000 // 5mins
 // axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 5000,
+  timeout: 60000,
 })
 
 // create cache outside the hook to persist between renders

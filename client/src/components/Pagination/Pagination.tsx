@@ -1,12 +1,6 @@
 import React, { useState } from 'react'
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from 'react-icons/fi'
-
-interface PaginationProps {
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
-  className?: string
-}
+import { PaginationProps } from './interface'
 
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,
@@ -80,7 +74,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
-          className='hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200'
+          className='hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer'
           aria-label='First page'
         >
           <FiChevronsLeft className='w-4 h-4' />
@@ -90,7 +84,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className='flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200'
+          className='flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer'
           aria-label='Previous page'
         >
           <FiChevronLeft className='w-4 h-4' />
@@ -103,12 +97,10 @@ const Pagination: React.FC<PaginationProps> = ({
               <button
                 key={index}
                 onClick={() => onPageChange(page)}
-                className={`sm:flex items-center justify-center w-8 h-8 rounded-md transition-colors duration-200
-                                          ${
-                                            currentPage === page
-                                              ? 'bg-[#ff5a2e] text-white'
-                                              : 'hover:bg-gray-100 text-gray-600'
-                                          }`}
+                className={`sm:flex items-center justify-center w-8 h-8 rounded-md transition-colors duration-200 cursor-pointer ${currentPage === page
+                    ? 'bg-[#ff5a2e] text-white'
+                    : 'hover:bg-gray-100 text-gray-600'
+                  }`}
               >
                 {page}
               </button>
@@ -123,7 +115,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className='flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200'
+          className='flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer'
           aria-label='Next page'
         >
           <FiChevronRight className='w-4 h-4' />
@@ -132,7 +124,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
-          className='hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200'
+          className='hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer'
           aria-label='Last page'
         >
           <FiChevronsRight className='w-4 h-4' />
@@ -148,8 +140,7 @@ const Pagination: React.FC<PaginationProps> = ({
             onChange={(e) => setJumpToPage(e.target.value)}
             onKeyDown={handleJumpToPage}
             placeholder='Jump to'
-            className='w-22 px-2 py-1 text-sm border rounded-md focus:outline-hidden 
-                                 focus:ring-1 focus:ring-[#ff5a2e]'
+            className='w-22 px-2 py-1 text-sm border rounded-md focus:outline-hidden focus:ring-1 focus:ring-[#ff5a2e]'
             min='1'
             max={totalPages}
           />
@@ -159,4 +150,4 @@ const Pagination: React.FC<PaginationProps> = ({
   )
 }
 
-export default Pagination
+export default React.memo(Pagination)

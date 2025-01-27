@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { FiX } from 'react-icons/fi'
-
-interface FilterModalProps {
-  isOpen: boolean
-  onClose: () => void
-  selectedTypes: string[]
-  onTypeSelect: (types: string[]) => void
-  sortField: string
-  sortOrder: 'asc' | 'desc'
-  onSortChange: (field: string, order: 'asc' | 'desc') => void
-}
+import { FilterModalProps } from './interface'
 
 const QUESTION_TYPES = [
   { value: 'ANAGRAM', label: 'Anagram' },
@@ -17,13 +8,19 @@ const QUESTION_TYPES = [
   { value: 'CONVERSATION', label: 'Conversation' },
   { value: 'MCQ', label: 'MCQ' },
   { value: 'READ_ALONG', label: 'Read Along' },
-]
+] as const
 
 const SORT_OPTIONS = [
   { value: 'createdAt', label: 'Created Time (Latest)' },
   { value: 'type', label: 'Question Type' },
   { value: 'title', label: 'Title' },
-]
+] as const
+
+const BATCH_LIMITS = [
+  { value: 10, label: '10' },
+  { value: 25, label: '25' },
+  { value: 50, label: '50' },
+] as const
 
 const FilterModal: React.FC<FilterModalProps> = ({
   isOpen,
@@ -33,11 +30,14 @@ const FilterModal: React.FC<FilterModalProps> = ({
   sortField,
   sortOrder,
   onSortChange,
+  batchLimit,
+  onBatchLimitChange,
 }) => {
   // temp filkter states
   const [tempTypes, setTempTypes] = useState<string[]>(selectedTypes)
-  const [tempSortField, setTempSortField] = useState(sortField)
-  const [tempSortOrder, setTempSortOrder] = useState(sortOrder)
+  const [tempSortField, setTempSortField] = useState<string>(sortField)
+  const [tempSortOrder, setTempSortOrder] = useState<"asc" | "desc">(sortOrder)
+  const [tempBatchLimit, setTempBatchLimit] = useState<number>(batchLimit)
 
   const handleEscapeKey = useCallback(
     (event: KeyboardEvent) => {
@@ -54,13 +54,14 @@ const FilterModal: React.FC<FilterModalProps> = ({
       setTempTypes(selectedTypes)
       setTempSortField(sortField)
       setTempSortOrder(sortOrder)
+      setTempBatchLimit(batchLimit)
       document.addEventListener('keydown', handleEscapeKey)
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscapeKey)
     }
-  }, [isOpen, selectedTypes, sortField, sortOrder, handleEscapeKey])
+  }, [isOpen, selectedTypes, sortField, sortOrder, batchLimit, handleEscapeKey])
 
   const handleTypeToggle = (type: string) => {
     setTempTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]))
@@ -69,8 +70,9 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const handleApplyFilters = useCallback(() => {
     onTypeSelect(tempTypes)
     onSortChange(tempSortField, tempSortOrder)
+    onBatchLimitChange(tempBatchLimit)
     onClose()
-  }, [tempTypes, tempSortField, tempSortOrder, onTypeSelect, onSortChange, onClose])
+  }, [tempTypes, tempSortField, tempSortOrder, tempBatchLimit, onTypeSelect, onSortChange, onBatchLimitChange, onClose])
 
   if (!isOpen) return null
 
@@ -102,7 +104,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
               {QUESTION_TYPES.map(({ value, label }) => (
                 <label
                   key={value}
-                  className='flex items-center px-3 py-1 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
+                  className='flex items-center px-3 py-0.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
                 >
                   <input
                     type='checkbox'
@@ -123,7 +125,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
               {SORT_OPTIONS.map(({ value, label }) => (
                 <label
                   key={value}
-                  className='flex items-center px-3 py-1 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
+                  className='flex items-center px-3 py-0.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
                 >
                   <input
                     type='radio'
@@ -147,7 +149,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
               ].map(({ value, label }) => (
                 <label
                   key={value}
-                  className='flex items-center px-3 py-1 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
+                  className='flex items-center px-3 py-0.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
                 >
                   <input
                     type='radio'
@@ -156,6 +158,31 @@ const FilterModal: React.FC<FilterModalProps> = ({
                     className='w-4 h-4 accent-[#ff5a2e] focus:ring-2 focus:ring-[#ff5a2e] border-gray-300'
                     name='sort-order'
                     aria-label={`Sort in ${label} order`}
+                  />
+                  <span className='ml-3 text-gray-700'>{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className='mb-6' role='group' aria-labelledby='batch-limit-title'>
+            <h4 id='batch-limit-title' className='text-sm font-medium text-gray-700 mb-3'>
+              Items Per Page
+            </h4>
+            <div className='flex flex-wrap gap-3'>
+              {BATCH_LIMITS.map(({ value, label }) => (
+                <label
+                  key={value}
+                  className='flex items-center px-3 py-0.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
+                >
+                  <input
+                    type='radio'
+                    name='batch-limit'
+                    value={value}
+                    checked={tempBatchLimit === value}
+                    onChange={() => setTempBatchLimit(value)}
+                    className='w-4 h-4 accent-[#ff5a2e] focus:ring-2 focus:ring-[#ff5a2e] border-gray-300'
+                    aria-label={`Show ${label}`}
                   />
                   <span className='ml-3 text-gray-700'>{label}</span>
                 </label>
@@ -185,4 +212,4 @@ const FilterModal: React.FC<FilterModalProps> = ({
   )
 }
 
-export default FilterModal
+export default React.memo(FilterModal)

@@ -3,10 +3,14 @@ export interface FilterBadgeProps {
   onRemove: () => void
 }
 
-export interface FilterBarProps {
+export interface FilterModalProps {
+  isOpen: boolean
+  onClose: () => void
   selectedTypes: string[]
-  onTypeRemove: (type: string) => void
-  sortOrder: 'asc' | 'desc'
+  onTypeSelect: (types: string[]) => void
   sortField: string
+  sortOrder: 'asc' | 'desc'
   onSortChange: (field: string, order: 'asc' | 'desc') => void
+  batchLimit: number
+  onBatchLimitChange: (limit: number) => void
 }
