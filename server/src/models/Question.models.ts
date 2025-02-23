@@ -20,9 +20,6 @@ const QuestionSchema: Schema = new Schema({
     solution: { type: String, required: true },
 }, { timestamps: true, autoIndex: true });
 
-// text index for title searches
-QuestionSchema.index({ title: 'text' });
-
 // Compound index for sorting and filtering
 QuestionSchema.index({
     type: 1,      // first level of filtering

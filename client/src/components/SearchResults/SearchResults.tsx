@@ -38,31 +38,37 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     )
   }
 
-  const renderOptions = useCallback((options: Question['options']) => (
-    <div className='mt-4'>
-      <h4 className='text-gray-700 font-semibold mb-2'>Options:</h4>
-      <ul className='list-disc list-inside space-y-0.5 w-full md:w-1/3 lg:w-1/4'>
-        {options.map((option, index) => (
-          <OptionItem key={index} option={option} />
-        ))}
-      </ul>
-    </div>
-  ), [])
-
-  const renderBlocks = useCallback((blocks: Question['blocks'], anagramType: Question['anagramType']) => (
-    <div className='mt-4'>
-      <h4 className='text-gray-700 font-semibold mb-2'>Blocks ({anagramType}):</h4>
-      <div
-        className={`grid ${anagramType === 'WORD' ? 'gap-2 grid-cols-8 md:grid-cols-12 lg:grid-cols-12' : 'gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4'}`}
-      >
-        {blocks
-          .sort(() => Math.random() - 0.5)
-          .map((block, index) => (
-            <BlockItem key={`${block.text}-${index}`} block={block} />
+  const renderOptions = useCallback(
+    (options: Question['options']) => (
+      <div className='mt-4'>
+        <h4 className='text-gray-700 font-semibold mb-2'>Options:</h4>
+        <ul className='list-disc list-inside space-y-0.5 w-full md:w-1/3 lg:w-1/4'>
+          {options.map((option, index) => (
+            <OptionItem key={index} option={option} />
           ))}
+        </ul>
       </div>
-    </div>
-  ), [])
+    ),
+    []
+  )
+
+  const renderBlocks = useCallback(
+    (blocks: Question['blocks'], anagramType: Question['anagramType']) => (
+      <div className='mt-4'>
+        <h4 className='text-gray-700 font-semibold mb-2'>Blocks ({anagramType}):</h4>
+        <div
+          className={`grid ${anagramType === 'WORD' ? 'gap-2 grid-cols-8 md:grid-cols-12 lg:grid-cols-12' : 'gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4'}`}
+        >
+          {blocks
+            .sort(() => Math.random() - 0.5)
+            .map((block, index) => (
+              <BlockItem key={`${block.text}-${index}`} block={block} />
+            ))}
+        </div>
+      </div>
+    ),
+    []
+  )
 
   // Memoize pagination visibility
   const showPagination = useMemo(() => totalPages > 1, [totalPages])

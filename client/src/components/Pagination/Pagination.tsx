@@ -97,10 +97,11 @@ const Pagination: React.FC<PaginationProps> = ({
               <button
                 key={index}
                 onClick={() => onPageChange(page)}
-                className={`sm:flex items-center justify-center w-8 h-8 rounded-md transition-colors duration-200 cursor-pointer ${currentPage === page
+                className={`sm:flex items-center justify-center w-8 h-8 rounded-md transition-colors duration-200 cursor-pointer ${
+                  currentPage === page
                     ? 'bg-[#ff5a2e] text-white'
                     : 'hover:bg-gray-100 text-gray-600'
-                  }`}
+                }`}
               >
                 {page}
               </button>

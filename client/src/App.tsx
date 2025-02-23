@@ -19,11 +19,14 @@ const App: React.FC = () => {
   const [batchLimit, setBatchLimit] = useState<number>(10)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false)
 
-  const searchParams = useMemo(() => ({
-    sortField,
-    sortOrder,
-    types: selectedTypes,
-  }), [sortField, sortOrder, selectedTypes]);
+  const searchParams = useMemo(
+    () => ({
+      sortField,
+      sortOrder,
+      types: selectedTypes,
+    }),
+    [sortField, sortOrder, selectedTypes]
+  )
 
   const { questions, totalPages, loading, error, refetch } = useQuestions(
     searchQuery,
@@ -33,24 +36,27 @@ const App: React.FC = () => {
   )
 
   const handleTypeClick = useCallback((type: string) => {
-    setSelectedTypes(prev => {
+    setSelectedTypes((prev) => {
       if (!prev.includes(type)) {
-        return [...prev, type];
+        return [...prev, type]
       }
-      return prev;
-    });
-    setCurrentPage(1);
-  }, []);
+      return prev
+    })
+    setCurrentPage(1)
+  }, [])
 
   const handleTypeSelect = useCallback((types: string[]) => {
     setSelectedTypes(types)
     setCurrentPage(1)
   }, [])
 
-  const handleTypeRemove = useCallback((type: string) => {
-    setSelectedTypes(selectedTypes.filter((t) => t !== type))
-    setCurrentPage(1)
-  }, [selectedTypes])
+  const handleTypeRemove = useCallback(
+    (type: string) => {
+      setSelectedTypes(selectedTypes.filter((t) => t !== type))
+      setCurrentPage(1)
+    },
+    [selectedTypes]
+  )
 
   const handleSortChange = useCallback((field: string, order: 'asc' | 'desc') => {
     setSortField(field)
@@ -63,26 +69,40 @@ const App: React.FC = () => {
     setCurrentPage(1)
   }, [])
 
-  const filterModalProps = useMemo(() => ({
-    isOpen: isFilterModalOpen,
-    onClose: () => setIsFilterModalOpen(false),
-    selectedTypes,
-    onTypeSelect: handleTypeSelect,
-    sortField,
-    sortOrder,
-    onSortChange: handleSortChange,
-    batchLimit,
-    onBatchLimitChange: setBatchLimit,
-  }), [isFilterModalOpen, selectedTypes, handleTypeSelect, sortField, sortOrder, handleSortChange, batchLimit])
+  const filterModalProps = useMemo(
+    () => ({
+      isOpen: isFilterModalOpen,
+      onClose: () => setIsFilterModalOpen(false),
+      selectedTypes,
+      onTypeSelect: handleTypeSelect,
+      sortField,
+      sortOrder,
+      onSortChange: handleSortChange,
+      batchLimit,
+      onBatchLimitChange: setBatchLimit,
+    }),
+    [
+      isFilterModalOpen,
+      selectedTypes,
+      handleTypeSelect,
+      sortField,
+      sortOrder,
+      handleSortChange,
+      batchLimit,
+    ]
+  )
 
-  const searchResultsProps = useMemo(() => ({
-    questions,
-    query: searchQuery,
-    currentPage,
-    totalPages,
-    onPageChange: setCurrentPage,
-    onTypeClick: handleTypeClick,
-  }), [questions, searchQuery, currentPage, totalPages, handleTypeClick]);
+  const searchResultsProps = useMemo(
+    () => ({
+      questions,
+      query: searchQuery,
+      currentPage,
+      totalPages,
+      onPageChange: setCurrentPage,
+      onTypeClick: handleTypeClick,
+    }),
+    [questions, searchQuery, currentPage, totalPages, handleTypeClick]
+  )
 
   return (
     <ErrorBoundary>
@@ -90,9 +110,9 @@ const App: React.FC = () => {
         <div className='container mx-auto px-4 py-8 '>
           <h1
             className='text-3xl font-bold text-center text-gray-800 mb-8'
-            aria-label='QuestSearch by SpeakX'
+            aria-label='QuestSearch'
           >
-            QuestSearch by <span className='text-[#ff5a2e] selection:text-[#7578f2]'>SpeakX</span>
+            Quest Search
           </h1>
 
           <div className='relative max-w-2xl mx-auto mb-8'>
@@ -128,17 +148,16 @@ const App: React.FC = () => {
           </div>
 
           {/* Filter Modal */}
-          <Suspense fallback={
-            <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
-              <FiLoader className="w-8 h-8 text-white animate-spin" />
-            </div>
-          }>
-            {isFilterModalOpen &&
-              <FilterModal
-                {...filterModalProps}
-                aria-label='Filter and sort options'
-              />
+          <Suspense
+            fallback={
+              <div className='fixed inset-0 bg-black/30 flex items-center justify-center'>
+                <FiLoader className='w-8 h-8 text-white animate-spin' />
+              </div>
             }
+          >
+            {isFilterModalOpen && (
+              <FilterModal {...filterModalProps} aria-label='Filter and sort options' />
+            )}
           </Suspense>
 
           {loading && (
@@ -152,24 +171,20 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {error && (
-            <Error error={error} onRetry={refetch} />
-          )}
+          {error && <Error error={error} onRetry={refetch} />}
 
-          {!loading && !error && questions.length === 0 && (
-            <EmptyState />
-          )}
+          {!loading && !error && questions.length === 0 && <EmptyState />}
 
           {!loading && !error && questions.length > 0 && (
-            <Suspense fallback={
-              <div className="flex justify-center py-8">
-                <FiLoader className="w-8 h-8 text-[#ff5a2e] animate-spin" />
-              </div>
-            }>
+            <Suspense
+              fallback={
+                <div className='flex justify-center py-8'>
+                  <FiLoader className='w-8 h-8 text-[#ff5a2e] animate-spin' />
+                </div>
+              }
+            >
               <section aria-label='Search results'>
-                <SearchResults
-                  {...searchResultsProps}
-                />
+                <SearchResults {...searchResultsProps} />
               </section>
             </Suspense>
           )}

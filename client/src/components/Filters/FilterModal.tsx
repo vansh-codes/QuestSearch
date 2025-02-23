@@ -36,7 +36,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
   // temp filkter states
   const [tempTypes, setTempTypes] = useState<string[]>(selectedTypes)
   const [tempSortField, setTempSortField] = useState<string>(sortField)
-  const [tempSortOrder, setTempSortOrder] = useState<"asc" | "desc">(sortOrder)
+  const [tempSortOrder, setTempSortOrder] = useState<'asc' | 'desc'>(sortOrder)
   const [tempBatchLimit, setTempBatchLimit] = useState<number>(batchLimit)
 
   const handleEscapeKey = useCallback(
@@ -72,7 +72,16 @@ const FilterModal: React.FC<FilterModalProps> = ({
     onSortChange(tempSortField, tempSortOrder)
     onBatchLimitChange(tempBatchLimit)
     onClose()
-  }, [tempTypes, tempSortField, tempSortOrder, tempBatchLimit, onTypeSelect, onSortChange, onBatchLimitChange, onClose])
+  }, [
+    tempTypes,
+    tempSortField,
+    tempSortOrder,
+    tempBatchLimit,
+    onTypeSelect,
+    onSortChange,
+    onBatchLimitChange,
+    onClose,
+  ])
 
   if (!isOpen) return null
 

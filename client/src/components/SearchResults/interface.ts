@@ -21,14 +21,14 @@ export interface QuestionCardProps {
 }
 
 export interface ViewButtonProps {
-  type: string;
-  isActive: boolean;
-  onClick: () => void;
+  type: string
+  isActive: boolean
+  onClick: () => void
 }
 
 export interface QuestionContentProps {
-  question: Question;
-  isActive: boolean;
-  renderOptions: (options: Question['options']) => React.ReactNode;
-  renderBlocks: (blocks: Question['blocks'], type: Question['anagramType']) => React.ReactNode;
+  question: Question
+  isActive: boolean
+  renderOptions: (options: Question['options']) => React.ReactNode
+  renderBlocks: (blocks: Question['blocks'], type: Question['anagramType']) => React.ReactNode
 }
